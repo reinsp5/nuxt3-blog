@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     strict: true,
     typeCheck: true,
   },
+  modules: ["@nuxtjs/tailwindcss"],
   build: {
     transpile: ["vuetify"],
   },
@@ -22,4 +23,17 @@ export default defineNuxtConfig({
     },
   },
   css: ["@/assets/main.scss"],
+  app: {
+    head: {
+      htmlAttrs: {
+        lang: "ja",
+      },
+    },
+  },
+  runtimeConfig: {
+    newt: {
+      spaceUid: "",
+      cdnApiToken: "",
+    },
+  },
 });
