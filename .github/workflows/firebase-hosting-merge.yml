@@ -6,14 +6,42 @@ name: Deploy to Firebase Hosting on merge
   push:
     branches:
       - main
+
 jobs:
   build_and_deploy:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v3
+      # リポジトリのチェックアウト
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Node.jsのセットアップ
+      - name: Setup Node18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+
+      # 依存関係のインストール
+      - name: Install dependencies
+        run: npm ci
+
+      # ビルド
+      - name: Generate
+        env:
+          NUXT_NEWT_SPACE_UID: ${{ secrets.NUXT_NEWT_SPACE_UID }}
+          NUXT_NEWT_CDN_API_TOKEN: ${{ secrets.NUXT_NEWT_CDN_API_TOKEN }}
+        run: |
+          npm run generate
+      
+      # デプロイ
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_NUXT_3_B0377 }}'
           channelId: live
           projectId: nuxt-3-b0377
+          
