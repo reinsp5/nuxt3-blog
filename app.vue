@@ -8,7 +8,7 @@ const icons = [mdiTwitter, mdiGithub];
   <v-app>
     <v-app-bar :elevation="0">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-app-bar-title>ブログ</v-app-bar-title>
+      <v-app-bar-title>実演用仮ブログ</v-app-bar-title>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" temporary>
       <v-list nav>

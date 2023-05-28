@@ -1,17 +1,40 @@
 <script lang="ts" setup>
 import type { Article } from "~/types/article";
+import type { Category } from "~/types/category";
 
-const { data } = await useAsyncData("articles", async () => {
+// 記事の取得
+const { data: articleData } = await useAsyncData("articles", async () => {
   const { $newtClient } = useNuxtApp();
   return await $newtClient.getContents<Article>({
     appUid: "blog",
     modelUid: "article",
     query: {
-      select: ["_id", "title", "slug", "body"],
+      select: [
+        "_id",
+        "_sys",
+        "title",
+        "slug",
+        "body",
+        "description",
+        "coverImage",
+        "categories",
+      ],
     },
   });
 });
-const articles = data.value?.items;
+const articles = articleData.value?.items;
+
+const { data: categoryData } = await useAsyncData("categories", async () => {
+  const { $newtClient } = useNuxtApp();
+  return await $newtClient.getContents<Category>({
+    appUid: "blog",
+    modelUid: "category",
+    query: {
+      select: ["_id", "name", "slug"],
+    },
+  });
+});
+const categories = categoryData.value?.items;
 
 useHead({
   title: "Newt・Nuxtブログ",
@@ -21,16 +44,35 @@ useHead({
 
 <template>
   <v-row class="ma-2 pa-2">
-    <v-col v-for="article in articles" :key="article._id">
-      <v-card height="100%">
+    <!-- ブログ記事 -->
+    <v-col cols="12" md="8">
+      <ArticleCard
+        v-for="article in articles"
+        :key="article._id"
+        :article="article"
+      />
+    </v-col>
+    <!-- サイドメニュー -->
+    <v-col cols="12" md="4">
+      <v-card>
+        <v-card-title>カテゴリー</v-card-title>
         <v-card-text>
-          <h2 class="text-h6">
-            <NuxtLink :to="`/blog/${article.slug}`">
-              {{ article.title }}
-            </NuxtLink>
-          </h2>
+          <v-chip-group>
+            <v-chip
+              v-for="category in categories"
+              :key="category._id"
+              class="ma-1"
+              color="primary"
+              text-color="white"
+              small
+              :to="`/category/${category.slug}`"
+            >
+              {{ category.name }}
+            </v-chip>
+          </v-chip-group>
         </v-card-text>
       </v-card>
+      <!-- 他のカード -->
     </v-col>
   </v-row>
 </template>
